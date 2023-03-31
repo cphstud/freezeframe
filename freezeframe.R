@@ -18,8 +18,6 @@ goalTryFem <- con$find(query='{"gender": "female",
 
   
 ### DATAWRANGLING
-shots <- data.frame(x = c(90, 85, 82, 78, 83, 74, 94, 91),
-                    y = c(43, 40, 52, 56, 44, 71, 60, 54))
 
 #create manual x and y vectors
 shots <- data.frame(x =c(103,102,101,118,109,100,100,91, 107,106),
@@ -27,11 +25,13 @@ shots <- data.frame(x =c(103,102,101,118,109,100,100,91, 107,106),
                     team = c(T,T,T,F,F,F,F,F,F,F))
 # viz m ggplot
 
-ggplot(shots) +
+xdf=dfForPlot(testshot)
+ggplot(xdf) +
   annotate_pitch(colour = "white",
                  dimensions = pitch_statsbomb,
                  fill   = "springgreen4",
                  limits = FALSE) +
+  ggtriPlayer(103,57)+
   geom_point(aes(x = x, y = y,color=team),
              size = 2) +
   theme_pitch() +
@@ -40,5 +40,26 @@ ggplot(shots) +
           "ggsoccer example")
 
 # functions
+dfForPlot <- function(vdf) {
+  #vdf=testshot
+  tmpff=vdf$freeze_frame[[1]][[1]]
+  x=sapply(tmpff$location,'[[',1)
+  y=sapply(tmpff$location,'[[',2)
+  team=tmpff$teammate
+  #add shooter
+  x=c(x,vdf$location[[1]][1])
+  y=c(y,tmpff$location[[1]][2])
+  team=c(team,T)
+  
+  df=data.frame(x,y,team)
+  return(df)
+}
+
+ggtriPlayer <- function(x,y) {
+  df <- data.frame( x=c(x,120,120),
+       y=c(y,36,44)) 
+  p <- geom_polygon(data=df,aes(x=x,y=y),alpha=0.4)
+  return(p)
+}
 
  
